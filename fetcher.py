@@ -2,18 +2,31 @@
 
 import csv
 import urllib3
-from io import BytesIO, StringIO, TextIOWrapper
+import matplotlib.pyplot as plt
+import datetime
 
 
-url = 'http://www.twse.com.tw/ch/trading/exchange/STOCK_DAY/STOCK_DAY_print.php?genpage=genpage/Report201606/201606_F3_1_8_2303.php&type=csv'
 
-http = urllib3.PoolManager()
-r = http.request('GET', url)
-print(type(r))
-#print(r.data.decode('cp950'))
-csvreader = csv.reader(r.data.decode('cp950').splitlines())
-print(csvreader)
-print(dir(csvreader))
-#print(csvreader)
-for i in csvreader:
-    print(i)
+def fetch_data(month):
+    url = 'http://www.twse.com.tw/ch/trading/exchange/STOCK_DAY/STOCK_DAY_print.php?genpage=genpage/Report2016{0:02d}/2016{0:02d}_F3_1_8_2303.php&type=csv'.format(month)
+
+    http = urllib3.PoolManager()
+    r = http.request('GET', url)
+    csvreader = csv.reader(r.data.decode('cp950').splitlines())
+    next(csvreader)
+    next(csvreader)
+    price_data = [data[6] for data in csvreader]
+
+    return price_data
+
+def serial_fetch(months=3):
+    data = []
+    this_month = datetime.date.today().month
+    for month in range(this_month-3, this_month):
+        data += fetch_data(month)
+    return data
+
+
+plt.plot(serial_fetch(5))
+plt.show()
+
