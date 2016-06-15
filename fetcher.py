@@ -4,6 +4,7 @@ import csv
 import urllib3
 import matplotlib.pyplot as plt
 import datetime
+import locale
 
 
 
@@ -15,7 +16,8 @@ def fetch_data(month):
     csvreader = csv.reader(r.data.decode('cp950').splitlines())
     next(csvreader)
     next(csvreader)
-    price_data = [data[6] for data in csvreader]
+    #price_data = [data[6] for data in csvreader]
+    price_data = [float(data[8].replace(',', '')) for data in csvreader]
 
     return price_data
 
